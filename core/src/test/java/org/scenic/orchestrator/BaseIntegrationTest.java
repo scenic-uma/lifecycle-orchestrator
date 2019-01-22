@@ -2,6 +2,7 @@ package org.scenic.orchestrator;
 
 import org.apache.brooklyn.rest.client.BrooklynApi;
 import org.junit.runner.RunWith;
+import org.scenic.orchestrator.config.ITConfig;
 import org.scenic.orchestrator.config.PropertyConfig;
 import org.scenic.orchestrator.config.SwaggerConfig;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -17,13 +18,9 @@ import org.springframework.test.context.junit4.SpringRunner;
  */
 @RunWith(SpringRunner.class)
 @TestPropertySource("classpath:application-it.properties")
-@SpringBootTest
-@ComponentScan(basePackages = "org.scenic.orchestrator",
-        excludeFilters = {@ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, value =
-                {PropertyConfig.class, SwaggerConfig.class})
-        })
+@SpringBootTest(classes = ITConfig.class)
 @AutoConfigureWireMock(port = 0)
-public class BaseIntegrationTest {
+public abstract class BaseIntegrationTest {
 
     @MockBean
     public BrooklynApi brooklynApi;

@@ -11,24 +11,25 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("/versions")
-public class DeployerVersioinController {
+public class CustomVersionsController {
 
     private final BrooklynApi brooklynApi;
 
     @Autowired
-    public DeployerVersioinController(final BrooklynApi brooklynApi) {
+    public CustomVersionsController(final BrooklynApi brooklynApi) {
         this.brooklynApi = brooklynApi;
     }
 
     @RequestMapping(value = "/version", method = RequestMethod.GET)
-    public String version() {
+    public String getVersion() {
         return brooklynApi.getVersionApi().getVersion();
     }
 
-
+/*
     @RequestMapping(value = "/deploy", method = RequestMethod.POST)
     public String deploy() {
         return "Deployer version: " + brooklynApi.getVersionApi().getVersion();
     }
+    */
 
 }
