@@ -25,11 +25,4 @@ public class CustomVersionsController {
         return brooklynApi.getVersionApi().getVersion();
     }
 
-/*
-    @RequestMapping(value = "/deploy", method = RequestMethod.POST)
-    public String deploy() {
-        return "Deployer version: " + brooklynApi.getVersionApi().getVersion();
-    }
-    */
-
 }

@@ -1,4 +1,4 @@
-package org.scenic.orchestrator.config;
+package org.scenic.orchestrator.it.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -10,7 +10,7 @@ import org.springframework.web.client.RestTemplate;
  * Created by Jose on 21/01/19.
  */
 @Configuration
-public class RestTemplateConfig {
+public class TestRestTemplateConfig {
 
     @Value("${wiremock.server.port}")
     private int port;

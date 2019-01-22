@@ -72,6 +72,12 @@
                 <version>2.0.4.RELEASE</version>
             </dependency>
 
+            <dependency>
+                <groupId>org.yaml</groupId>
+                <artifactId>snakeyaml</artifactId>
+                <version>1.21</version>
+            </dependency>
+
             <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-test -->
             <dependency>
                 <groupId>org.springframework.boot</groupId>

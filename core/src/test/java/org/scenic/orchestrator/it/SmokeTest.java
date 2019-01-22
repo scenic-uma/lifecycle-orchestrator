@@ -1,4 +1,4 @@
-package org.scenic.orchestrator;
+package org.scenic.orchestrator.it;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
@@ -11,6 +11,7 @@ import org.apache.brooklyn.rest.api.VersionApi;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
+import org.scenic.orchestrator.it.BaseIntegrationTest;
 import org.scenic.orchestrator.webapp.CustomVersionsController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

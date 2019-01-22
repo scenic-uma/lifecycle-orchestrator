@@ -1,4 +1,4 @@
-package org.scenic.orchestrator.core;
+package org.scenic.orchestrator.core.deployer;
 
 /**
  * Wraps Brooklyn API.

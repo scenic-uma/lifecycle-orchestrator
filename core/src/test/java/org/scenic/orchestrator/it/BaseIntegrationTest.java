@@ -1,8 +1,8 @@
-package org.scenic.orchestrator;
+package org.scenic.orchestrator.it;
 
 import org.apache.brooklyn.rest.client.BrooklynApi;
 import org.junit.runner.RunWith;
-import org.scenic.orchestrator.config.ITConfig;
+import org.scenic.orchestrator.it.config.ITConfig;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
