@@ -38,7 +38,7 @@ public class SmokeTest extends BaseIntegrationTest {
         when(versionApi.getVersion()).thenReturn(VERSION);
     }
 
-    //@Test
+    @Test
     public void test() {
         assertThat(customVersionsController.getVersion()).isEqualTo(VERSION);
     }
