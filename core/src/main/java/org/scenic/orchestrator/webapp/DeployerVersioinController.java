@@ -22,7 +22,13 @@ public class DeployerVersioinController {
 
     @RequestMapping(value = "/version", method = RequestMethod.GET)
     public String version() {
-        return "Greetings from Spring Boot!" + brooklynApi.getVersionApi().getVersion();
+        return brooklynApi.getVersionApi().getVersion();
+    }
+
+
+    @RequestMapping(value = "/deploy", method = RequestMethod.POST)
+    public String deploy() {
+        return "Deployer version: " + brooklynApi.getVersionApi().getVersion();
     }
 
 }
