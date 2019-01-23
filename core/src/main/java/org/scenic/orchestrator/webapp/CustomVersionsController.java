@@ -20,6 +20,8 @@ public class CustomVersionsController {
         this.brooklynApi = brooklynApi;
     }
 
+    //TODO: instead of use snakeyaml it will be necessary to uses Alien4Cloud transformer to
+    //TODO manage TOSCA object domain
     @RequestMapping(value = "/version", method = RequestMethod.GET)
     public String getVersion() {
         return brooklynApi.getVersionApi().getVersion();

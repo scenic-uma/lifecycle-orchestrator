@@ -25,13 +25,11 @@ public class ManagerAnalyzerClient {
 
     private final RestTemplate restTemplate;
 
-    private final ObjectMapper objectMapper;
 
 
     @Autowired
-    public ManagerAnalyzerClient(RestTemplate restTemplate, ObjectMapper objectMapper) {
+    public ManagerAnalyzerClient(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
-        this.objectMapper = objectMapper;
     }
 
     public void deployApplication(String application) {
