@@ -10,14 +10,19 @@ import org.springframework.stereotype.Service;
 public class DeployerService {
 
     private final ApplicationContextManagerService applicationContextManagerService;
+    private final DeploymentOrchestrator deploymentOrchestrator;
 
-    public DeployerService(ApplicationContextManagerService applicationContextManagerService) {
+    public DeployerService(ApplicationContextManagerService applicationContextManagerService,
+                           DeploymentOrchestrator deploymentOrchestrator) {
         this.applicationContextManagerService = applicationContextManagerService;
+        this.deploymentOrchestrator=deploymentOrchestrator;
     }
 
-    public void deploy(String applicationTopology) {
+    public void deploy(String applicationTopology)
+            throws InterruptedException {
         RunningAppContext runningAppContext = applicationContextManagerService.postApplicationContext(applicationTopology);
-
+        deploymentOrchestrator.deploy(runningAppContext);
+        System.out.println("FINNNN");
 
     }
 

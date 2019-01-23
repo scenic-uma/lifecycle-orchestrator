@@ -6,6 +6,7 @@ import org.scenic.orchestrator.core.dto.ApplicationStatus;
 import org.scenic.orchestrator.core.dto.InitialAppStatusService;
 import org.scenic.orchestrator.core.dto.Plan;
 import org.scenic.orchestrator.core.dto.RunningAppContext;
+import org.scenic.orchestrator.core.modifier.TopologyModifierService;
 import org.springframework.stereotype.Service;
 import org.yaml.snakeyaml.Yaml;
 
@@ -23,10 +24,15 @@ public class ApplicationContextManagerService {
 
     private final InitialAppStatusService initialAppStatusService;
 
-    public ApplicationContextManagerService(ManagerAnalyzerClient managerAnalyzerClient, Yaml yaml, InitialAppStatusService initialAppStatusService) {
+    private final TopologyModifierService topologyModifierService;
+
+    public ApplicationContextManagerService(ManagerAnalyzerClient managerAnalyzerClient, Yaml yaml,
+                                            InitialAppStatusService initialAppStatusService,
+                                            TopologyModifierService topologyModifierService) {
         this.managerAnalyzerClient = managerAnalyzerClient;
         this.yaml = yaml;
         this.initialAppStatusService = initialAppStatusService;
+        this.topologyModifierService = topologyModifierService;
     }
 
     public RunningAppContext postApplicationContext(String applicationTopology) {
@@ -36,7 +42,7 @@ public class ApplicationContextManagerService {
         final Plan plan = managerAnalyzerClient.getPlan(getApplicationName(applicationTopology));
         final ApplicationStatus status = initialAppStatusService.build(plan.getEntities());
 
-        return new RunningAppContext(applicationName, status, plan);
+        return new RunningAppContext(applicationName, status, plan, topologyModifierService.apply(applicationTopology));
     }
 
     private String getApplicationName(String applicationTopology) {

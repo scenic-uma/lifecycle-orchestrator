@@ -23,7 +23,7 @@ public class DeployController {
 
 
     @PostMapping("/deploy")
-    public void deployApp(@RequestBody String app) {
+    public void deployApp(@RequestBody String app) throws InterruptedException {
         deployerService.deploy(app);
     }
 

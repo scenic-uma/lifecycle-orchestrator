@@ -11,27 +11,22 @@ public class RunningAppContext {
 
     private Plan plan;
 
+    private String applicationTopology;
 
-    public RunningAppContext(String applicationName, ApplicationStatus status, Plan plan) {
+
+    public RunningAppContext(String applicationName, ApplicationStatus status, Plan plan, String applicationTopology) {
         this.status = status;
         this.applicationName = applicationName;
         this.plan = plan;
+        this.applicationTopology = applicationTopology;
     }
 
     public ApplicationStatus getStatus() {
         return status;
     }
 
-    public void setStatus(ApplicationStatus status) {
-        this.status = status;
-    }
-
     public String getApplicationName() {
         return applicationName;
-    }
-
-    public void setApplicationName(String applicationName) {
-        this.applicationName = applicationName;
     }
 
     public Plan getPlan() {
@@ -40,5 +35,13 @@ public class RunningAppContext {
 
     public void setPlan(Plan plan) {
         this.plan = plan;
+    }
+
+    public String getApplicationTopology() {
+        return applicationTopology;
+    }
+
+    public void setStatus(ApplicationStatus status) {
+        this.status = status;
     }
 }

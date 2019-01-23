@@ -1,0 +1,178 @@
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+
+tosca_definitions_version: tosca_simple_yaml_1_0_0_wd03
+
+imports:
+  - tosca-normative-types:1.0.0.wd06-SNAPSHOT
+
+template_name: SoftcareApp
+template_version: 0.1.0-SNAPSHOT
+template_author: kiuby88
+
+description: Alien4Cloud generated SoftcareApp topology
+
+relationship_types:
+  brooklyn.relationships.Configure:
+    derived_from: tosca.relationships.DependsOn
+    valid_targets: [ tosca.capabilities.Endpoint ]
+    properties:
+      prop.name:
+        type: string
+        required: false
+      prop.value:
+        type: string
+        required: true
+      prop.collection:
+        type: string
+        required: false
+
+
+node_types:
+  org.apache.brooklyn.entity.webapp.tomcat.TomcatServer:
+    derived_from: tosca.nodes.Root
+    description: >
+      A simple Tomcat server
+    properties:
+      version:
+        type: string
+        required: false
+        default: 7.0.65
+      http.port:
+        type: list
+        required: false
+        entry_schema:
+          type: string
+      java.sysprops:
+        type: map
+        required: false
+        entry_schema:
+          type: string
+      wars.root:
+        type: string
+        required: false
+    capabilities:
+      endpoint_configuration: tosca.capabilities.Endpoint
+    requirements:
+      - dbConnection: tosca.nodes.Root
+        type: brooklyn.relationships.Configure
+        lower_bound: 0
+        upper_bound: unbounded
+      - endpoint_configuration: tosca.nodes.Root
+        type: brooklyn.relationships.Configure
+        lower_bound: 0
+        upper_bound: unbounded
+
+  org.apache.brooklyn.entity.database.mysql.MySqlNode:
+    derived_from: tosca.nodes.Root
+    description: >
+      A node to install MySQL v5.5 database with data
+      on a specific attached volume.
+    properties:
+      port:
+        type: integer
+        default: 3306
+        description: The port on which the underlying database service will listen to data.
+      version:
+        type: string
+        default: 5.6.26
+        requirements: false
+      creationScriptUrl:
+        type: string
+        required: true
+    capabilities:
+      dbConnection: tosca.capabilities.Endpoint.Database
+
+topology_template:
+  node_templates:
+    Softcare_dashboard:
+      type: org.apache.brooklyn.entity.webapp.tomcat.TomcatServer
+      properties:
+        version: 7.0.65
+        wars.root: "https://s3-eu-west-1.amazonaws.com/atos-paas/v3/softcare-gui.war"
+      requirements:
+        - endpoint_configuration:
+            node: SoftcareWS
+            capability: tosca.capabilities.Endpoint
+            relationship: brooklyn.relationships.Configure
+            properties:
+              prop.collection: java.sysprops
+              prop.value: $brooklyn:component("SoftcareWS").attributeWhenReady("webapp.url")
+              prop.name: softcarews
+        - endpoint_configuration:
+            node: Forum
+            capability: tosca.capabilities.Endpoint
+            relationship: brooklyn.relationships.Configure
+            properties:
+              prop.collection: java.sysprops
+              prop.value: $brooklyn:component("Forum").attributeWhenReady("webapp.url")
+              prop.name: softcareforum
+
+    Forum:
+      type: org.apache.brooklyn.entity.webapp.tomcat.TomcatServer
+      properties:
+        version: 7.0.65
+        wars.root: "https://s3-eu-west-1.amazonaws.com/atos-paas/v3/softcare-forum.war"
+      requirements:
+        - dbConnection:
+            node: ForumDB
+            capability: tosca.capabilities.Endpoint.Database
+            relationship: brooklyn.relationships.Configure
+            properties:
+              prop.collection: java.sysprops
+              prop.value: $brooklyn:formatString("jdbc:mysql://%s:%s/%s?user=%s&password=%s", component("ForumDB").attributeWhenReady("host.address"), "3306", "forumdb", "sc-forumdb-admin", "pass123")
+              prop.name: connUrl
+
+    SoftcareWS:
+      type: org.apache.brooklyn.entity.webapp.tomcat.TomcatServer
+      properties:
+        version: 7.0.65
+        wars.root: "https://s3-eu-west-1.amazonaws.com/atos-paas/v3/softcare-ws.war"
+      requirements:
+        - dbConnection:
+            node: SoftcareDB
+            capability: tosca.capabilities.Endpoint.Database
+            relationship: brooklyn.relationships.Configure
+            properties:
+              prop.collection: java.sysprops
+              prop.value: $brooklyn:formatString("jdbc:mysql://%s:%s/%s?user=%s&password=%s", component("SoftcareDB").attributeWhenReady("host.address"), "3306", "softcare", "sc-admin", "pass123")
+              prop.name: connUrl
+
+    SoftcareDB:
+      type: org.apache.brooklyn.entity.database.mysql.MySqlNode
+      properties:
+        port: 3306
+        version: 5.6.26
+        creationScriptUrl: "https://s3-eu-west-1.amazonaws.com/atos-paas/v3/softcare_db.sql"
+
+    ForumDB:
+      type: org.apache.brooklyn.entity.database.mysql.MySqlNode
+      properties:
+        port: 3306
+        version: 5.6.26
+        creationScriptUrl: "https://s3-eu-west-1.amazonaws.com/atos-paas/v3/forumdb.sql"
+
+  groups:
+    add_Softcare_db_locations:
+      members: [ SoftcareDB , ForumDB , MultimediaDB ]
+      policies:
+        - brooklyn.location: aws-ec2:eu-west-1
+
+    add_Softcare_locations:
+      members: [ SoftcareWS , Forum , Softcare_dashboard , Multimedia ]
+      policies:
+        - brooklyn.location: aws-ec2:eu-west-1
