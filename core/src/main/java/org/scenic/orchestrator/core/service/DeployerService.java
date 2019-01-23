@@ -2,6 +2,9 @@ package org.scenic.orchestrator.core.service;
 
 import java.util.Map;
 
+import org.scenic.orchestrator.core.dto.RunningAppContext;
+import org.scenic.orchestrator.core.dto.ApplicationStatus;
+import org.scenic.orchestrator.core.dto.InitialAppStatusService;
 import org.scenic.orchestrator.core.dto.Plan;
 import org.springframework.stereotype.Service;
 import org.yaml.snakeyaml.Yaml;
@@ -16,28 +19,35 @@ public class DeployerService {
 
     private final Yaml yaml;
 
-    public DeployerService(ManagerAnalyzerClient managerAnalyzerClient, Yaml yaml) {
+    private final InitialAppStatusService initialAppStatusService;
+
+    public DeployerService(ManagerAnalyzerClient managerAnalyzerClient, Yaml yaml, InitialAppStatusService initialAppStatusService) {
         this.managerAnalyzerClient = managerAnalyzerClient;
         this.yaml = yaml;
+        this.initialAppStatusService = initialAppStatusService;
     }
 
-    public void deploy(String application) {
+    public void deploy(String applicationTopology) {
 
         //TODO: instead of use snakeyaml it will be necessary to uses Alien4Cloud transformer to
         //TODO manage TOSCA object domains
 
-        managerAnalyzerClient.deployApplication(application);
-        //need to find the topology components
-        Plan plan = managerAnalyzerClient.getPlan(getApplicationName(application));
+        String applicationName = getApplicationName(applicationTopology);
+        managerAnalyzerClient.deployApplication(applicationTopology);
+        managerAnalyzerClient.putStatus(applicationName, initialAppStatusService.build(applicationTopology));
+        Plan plan = managerAnalyzerClient.getPlan(getApplicationName(applicationTopology));
+        ApplicationStatus status = initialAppStatusService.build(plan.getEntities());
 
-        System.out.println(plan);
+        RunningAppContext runningAppContext= new RunningAppContext(applicationName, status, plan);
+        System.out.println(runningAppContext);
     }
 
-    private String getApplicationName(String app){
-        final Map<String, Object> obj = yaml.load(app);
-
+    private String getApplicationName(String applicationTopology){
+        final Map<String, Object> obj = yaml.load(applicationTopology);
         return obj.get("template_name").toString();
     }
+
+
 
 
 }
