@@ -22,8 +22,6 @@ public class DeployerService {
             throws InterruptedException {
         RunningAppContext runningAppContext = applicationContextManagerService.postApplicationContext(applicationTopology);
         deploymentOrchestrator.deploy(runningAppContext);
-        System.out.println("FINNNN");
-
     }
 
 
