@@ -9,12 +9,12 @@ public class PlanStep {
     @JsonProperty("interface")
     private String intf;
 
-    private String operation;
+    private PlanOperation operation;
 
     public PlanStep() {
     }
 
-    public PlanStep(String node, String intf, String operation) {
+    public PlanStep(String node, String intf, PlanOperation operation) {
         this.node = node;
         this.intf = intf;
         this.operation = operation;
@@ -28,7 +28,7 @@ public class PlanStep {
         return this.intf;
     }
 
-    public String getOperation() {
+    public PlanOperation getOperation() {
         return this.operation;
     }
 }

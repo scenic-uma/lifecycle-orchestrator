@@ -27,4 +27,12 @@ public class ApplicationStatus {
     public void setTarget(Map<String, EntityStatus> target) {
         this.target = target;
     }
+
+    public Map<String, EntityStatus> getCurrent() {
+        return current;
+    }
+
+    public void setCurrent(Map<String, EntityStatus> current) {
+        this.current = current;
+    }
 }

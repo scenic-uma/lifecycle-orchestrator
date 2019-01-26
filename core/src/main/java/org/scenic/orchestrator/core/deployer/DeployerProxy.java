@@ -5,12 +5,16 @@ import javax.ws.rs.core.Response;
 
 import org.apache.brooklyn.rest.api.ApplicationApi;
 import org.apache.brooklyn.rest.client.BrooklynApi;
+import org.apache.brooklyn.util.collections.MutableMap;
 import org.apache.http.HttpStatus;
 import org.scenic.orchestrator.core.deployer.dto.CustomApplicationEntities;
 import org.scenic.orchestrator.core.deployer.dto.EffectorTemplate;
+import org.scenic.orchestrator.core.dto.RunningAppContext;
 import org.scenic.orchestrator.core.exception.DeploymentException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpServerErrorException;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * Wraps Brooklyn API.
@@ -18,18 +22,27 @@ import org.springframework.web.client.HttpServerErrorException;
 @Component
 public class DeployerProxy {
 
+    private static final String EFFECTOR_ERROR_MESSAGE ="*ERROR: processing effector %s for %s(%s)";
+
+
     private static final String START_EFFECTOR_NAME = "start";
+    private static final String STOP_EFFECTOR_NAME = "stop";
+    private static final String STOP_MACHINE_MODE = "stopMachineMode";
+    private static final String STOP_MACHINE_IF_NOT_STOPPED = "IF_NOT_STOPPED";
 
     private final BrooklynApi brooklynApi;
     private final ApplicationApi applicationApi;
 
     private final CustomBrooklynClient customBrooklynClient;
+    private final ObjectMapper objectMapper;
 
-    public DeployerProxy(BrooklynApi brooklynApi, CustomBrooklynClient customBrooklynClient) {
+    public DeployerProxy(BrooklynApi brooklynApi, CustomBrooklynClient customBrooklynClient, ObjectMapper objectMapper
+    ) {
 
         this.brooklynApi = brooklynApi;
         this.applicationApi = brooklynApi.getApplicationApi();
         this.customBrooklynClient = customBrooklynClient;
+        this.objectMapper = objectMapper;
     }
 
     public String deployApp(String appName, String blueprint) {
@@ -49,13 +62,35 @@ public class DeployerProxy {
         return new CustomApplicationEntities(customBrooklynClient.getDescendant(applicationId));
     }
 
-    public void startEffector(String appId, String entityId) {
-        EffectorTemplate effectorTemplate = new EffectorTemplate(appId, entityId, START_EFFECTOR_NAME);
+    public void startEffector(RunningAppContext app, String entityId) {
+        EffectorTemplate effectorTemplate = new EffectorTemplate(app, entityId, START_EFFECTOR_NAME);
+        executeEffector(effectorTemplate );
+    }
+
+    public void stopEffector(RunningAppContext app, String entityId) {
+        EffectorTemplate effectorTemplate =
+                new EffectorTemplate(app, entityId, STOP_EFFECTOR_NAME, getStopBody());
+        executeEffector(effectorTemplate );
+    }
+
+    private void executeEffector(EffectorTemplate effectorTemplate ){
         try {
             customBrooklynClient.executeEffector(effectorTemplate);
         } catch (HttpServerErrorException e) {
-            System.out.println("Error processing effector START for " + appId + " - " + entityId);
+            System.out.println(String.format(EFFECTOR_ERROR_MESSAGE,
+                    effectorTemplate.getEffectorName().toUpperCase(),
+                    effectorTemplate.getEntityName(),
+                    effectorTemplate.getEntityId()));
             throw e;
         }
+    }
+
+    public String getStopBody() {
+        try {
+            return objectMapper.writeValueAsString(MutableMap.of(STOP_MACHINE_MODE, STOP_MACHINE_IF_NOT_STOPPED));
+        } catch (Exception e) {
+            throw new RuntimeException("STOP params can not be generated", e);
+        }
+
     }
 }

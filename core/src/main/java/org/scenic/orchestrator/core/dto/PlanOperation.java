@@ -1,5 +1,6 @@
 package org.scenic.orchestrator.core.dto;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 /**
@@ -7,7 +8,9 @@ import com.fasterxml.jackson.annotation.JsonValue;
  */
 public enum PlanOperation {
 
-    START("start"), STOP("stop"), RELEASE("release");
+    START("start"),
+    STOP("stop"),
+    RELEASE("release");
 
     private String alias;
 
@@ -18,6 +21,16 @@ public enum PlanOperation {
     @JsonValue
     public String getAlias() {
         return alias;
+    }
+
+    @JsonCreator
+    public static PlanOperation  fromAlias(String alias){
+        for(PlanOperation e : PlanOperation.values()) {
+            if(e.name().equalsIgnoreCase(alias)) {
+                return e;
+            }
+        }
+        return null;
     }
 
 

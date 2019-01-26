@@ -65,4 +65,7 @@ public class RunningAppContext {
     public CustomEntity getEntityByDisplayName(String name){
         return this.entities.getEntityByName(name);
     }
+    public CustomEntity getEntityById(String id){
+        return this.entities.getEntityById(id);
+    }
 }
