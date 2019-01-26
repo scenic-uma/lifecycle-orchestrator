@@ -1,5 +1,8 @@
 package org.scenic.orchestrator.core.dto;
 
+import org.scenic.orchestrator.core.deployer.dto.CustomApplicationEntities;
+import org.scenic.orchestrator.core.deployer.dto.CustomEntity;
+
 /**
  * Created by Jose on 23/01/19.
  */
@@ -12,6 +15,8 @@ public class RunningAppContext {
     private Plan plan;
 
     private String applicationTopology;
+    private String appId;
+    private CustomApplicationEntities entities;
 
 
     public RunningAppContext(String applicationName, ApplicationStatus status, Plan plan, String applicationTopology) {
@@ -43,5 +48,24 @@ public class RunningAppContext {
 
     public void setStatus(ApplicationStatus status) {
         this.status = status;
+    }
+
+    public void setAppId(String appId) {
+        this.appId = appId;
+    }
+
+    public String getAppId() {
+        return appId;
+    }
+
+    public void setEntities(CustomApplicationEntities entities) {
+        this.entities = entities;
+    }
+
+    public CustomEntity getEntityByDisplayName(String name){
+        return this.entities.getEntityByName(name);
+    }
+    public CustomEntity getEntityById(String id){
+        return this.entities.getEntityById(id);
     }
 }

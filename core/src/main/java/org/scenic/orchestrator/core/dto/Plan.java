@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class Plan {
 
@@ -18,7 +19,7 @@ public class Plan {
         this.plan = plan;
     }
 
-    public void addStep(String node, String intf, String operation) {
+    public void addStep(String node, String intf, PlanOperation operation) {
         this.plan.add(new PlanStep(node, intf, operation));
     }
 
