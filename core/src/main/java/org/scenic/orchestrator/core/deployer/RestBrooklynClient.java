@@ -1,5 +1,7 @@
 package org.scenic.orchestrator.core.deployer;
 
+import java.util.Arrays;
+
 import org.scenic.orchestrator.core.deployer.dto.CustomEntity;
 import org.scenic.orchestrator.core.deployer.dto.EffectorTemplate;
 import org.springframework.http.HttpEntity;
@@ -14,7 +16,7 @@ import com.google.common.collect.ImmutableList;
  * Created by Jose on 24/01/19.
  */
 @Service
-public class CustomBrooklynClient {
+public class RestBrooklynClient {
     private static final String EFFECTOR_MESSAGE = "Processing effector %s for %s(%s)";
 
 
@@ -22,12 +24,16 @@ public class CustomBrooklynClient {
 
     private final RestTemplate brooklynRestTemplate;
 
-    public CustomBrooklynClient(RestTemplate brooklynRestTemplate) {
+    public RestBrooklynClient(RestTemplate brooklynRestTemplate) {
         this.brooklynRestTemplate = brooklynRestTemplate;
     }
 
     public CustomEntity[] getDescendant(String applicationId) {
-        return brooklynRestTemplate.getForEntity(String.format(APP_DESCENDANT, applicationId), CustomEntity[].class).getBody();
+        String uri = String.format(APP_DESCENDANT, applicationId);
+        CustomEntity[] entities =
+                brooklynRestTemplate.getForEntity(uri, CustomEntity[].class).getBody();
+        Arrays.stream(entities).forEach(c -> c.setBrooklynRestTemplate(brooklynRestTemplate));
+        return entities;
     }
 
     public void executeEffector(EffectorTemplate effectorTemplate) {

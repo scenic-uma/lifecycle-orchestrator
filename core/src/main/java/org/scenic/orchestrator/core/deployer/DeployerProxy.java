@@ -22,7 +22,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @Component
 public class DeployerProxy {
 
-    private static final String EFFECTOR_ERROR_MESSAGE ="*ERROR: processing effector %s for %s(%s)";
+    private static final String EFFECTOR_ERROR_MESSAGE = "*ERROR: processing effector %s for %s(%s)";
 
 
     private static final String START_EFFECTOR_NAME = "start";
@@ -33,15 +33,16 @@ public class DeployerProxy {
     private final BrooklynApi brooklynApi;
     private final ApplicationApi applicationApi;
 
-    private final CustomBrooklynClient customBrooklynClient;
+    private final RestBrooklynClient restBrooklynClient;
     private final ObjectMapper objectMapper;
 
-    public DeployerProxy(BrooklynApi brooklynApi, CustomBrooklynClient customBrooklynClient, ObjectMapper objectMapper
-    ) {
+    public DeployerProxy(BrooklynApi brooklynApi,
+                         RestBrooklynClient restBrooklynClient,
+                         ObjectMapper objectMapper) {
 
         this.brooklynApi = brooklynApi;
         this.applicationApi = brooklynApi.getApplicationApi();
-        this.customBrooklynClient = customBrooklynClient;
+        this.restBrooklynClient = restBrooklynClient;
         this.objectMapper = objectMapper;
     }
 
@@ -59,23 +60,23 @@ public class DeployerProxy {
     }
 
     public CustomApplicationEntities getApplicationEntities(String applicationId) {
-        return new CustomApplicationEntities(customBrooklynClient.getDescendant(applicationId));
+        return new CustomApplicationEntities(restBrooklynClient.getDescendant(applicationId));
     }
 
     public void startEffector(RunningAppContext app, String entityId) {
         EffectorTemplate effectorTemplate = new EffectorTemplate(app, entityId, START_EFFECTOR_NAME);
-        executeEffector(effectorTemplate );
+        executeEffector(effectorTemplate);
     }
 
     public void stopEffector(RunningAppContext app, String entityId) {
         EffectorTemplate effectorTemplate =
                 new EffectorTemplate(app, entityId, STOP_EFFECTOR_NAME, getStopBody());
-        executeEffector(effectorTemplate );
+        executeEffector(effectorTemplate);
     }
 
-    private void executeEffector(EffectorTemplate effectorTemplate ){
+    private void executeEffector(EffectorTemplate effectorTemplate) {
         try {
-            customBrooklynClient.executeEffector(effectorTemplate);
+            restBrooklynClient.executeEffector(effectorTemplate);
         } catch (HttpServerErrorException e) {
             System.out.println(String.format(EFFECTOR_ERROR_MESSAGE,
                     effectorTemplate.getEffectorName().toUpperCase(),

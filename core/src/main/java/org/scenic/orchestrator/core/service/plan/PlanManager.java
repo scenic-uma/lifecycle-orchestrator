@@ -1,5 +1,6 @@
 package org.scenic.orchestrator.core.service.plan;
 
+import org.apache.brooklyn.api.mgmt.ManagementContext;
 import org.scenic.orchestrator.core.dto.RunningAppContext;
 import org.springframework.stereotype.Service;
 
@@ -13,27 +14,34 @@ public class PlanManager {
     private final PlanExecutor planExecutor;
     private final RunningAppContextSynchronizer runningAppContextSynchronizer;
 
-    public PlanManager(PlanExecutor planExecutor, RunningAppContextSynchronizer runningAppContextSynchronizer){
-        this.planExecutor=planExecutor;
-        this.runningAppContextSynchronizer=runningAppContextSynchronizer;
+    public PlanManager(PlanExecutor planExecutor, RunningAppContextSynchronizer runningAppContextSynchronizer) {
+        this.planExecutor = planExecutor;
+        this.runningAppContextSynchronizer = runningAppContextSynchronizer;
     }
 
-    public void manage(RunningAppContext appContext) {
-        try{
+
+    public void update(RunningAppContext appContext) {
+        synchronizeAppContext(appContext);
+        deploy(appContext);
+    }
+
+    public void deploy(RunningAppContext appContext) {
+        try {
             this.executePlan(appContext);
         } catch (Exception e) {
             synchronizeAppContext(appContext);
-            manage(appContext);
+            deploy(appContext);
         }
+    }
+
+    private void executePlan(RunningAppContext appContext) {
+        planExecutor.executePlan(appContext);
     }
 
     private void synchronizeAppContext(RunningAppContext appContext) {
         System.out.println("Synchronizing App Context");
+        appContext.updateStatus();
         runningAppContextSynchronizer.updateContext(appContext);
-    }
-
-    private void executePlan(RunningAppContext appContext){
-        planExecutor.executePlan(appContext);
     }
 
 }
