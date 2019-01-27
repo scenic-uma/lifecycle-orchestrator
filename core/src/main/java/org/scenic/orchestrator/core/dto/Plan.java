@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class Plan {
 
@@ -30,6 +29,11 @@ public class Plan {
     @JsonIgnore
     public List<String> getEntities() {
         return plan.stream().map(PlanStep::getNode).collect(Collectors.toList());
+    }
+
+    @JsonIgnore
+    public boolean isEmpty() {
+        return plan != null && plan.isEmpty();
     }
 
 }

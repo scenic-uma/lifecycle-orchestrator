@@ -27,7 +27,7 @@ public class RunningAppContextSynchronizer {
         this.managerAnalyzerClient.putStatus(appName, appContext.getStatus());
         appContext.setPlan(this.managerAnalyzerClient.getPlan(appName));
         System.out.println("--------**");
-        System.out.println("Wrong status: " + statusToString(appContext.getStatus()));
+        System.out.println("Status: " + statusToString(appContext.getStatus()));
         System.out.println("Synchronizing new plan: " + planToString(appContext.getPlan()));
         System.out.println("--------**");
     }
