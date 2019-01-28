@@ -1,5 +1,6 @@
 package org.scenic.orchestrator.core.dto;
 
+import org.scenic.orchestrator.core.deployer.dto.BrooklynEntityStatus;
 import org.scenic.orchestrator.core.deployer.dto.CustomApplicationEntities;
 import org.scenic.orchestrator.core.deployer.dto.CustomEntity;
 
@@ -62,10 +63,34 @@ public class RunningAppContext {
         this.entities = entities;
     }
 
-    public CustomEntity getEntityByDisplayName(String name){
+    public CustomEntity getEntityByDisplayName(String name) {
         return this.entities.getEntityByName(name);
     }
-    public CustomEntity getEntityById(String id){
+
+    public CustomEntity getEntityById(String id) {
         return this.entities.getEntityById(id);
+    }
+
+    public boolean isUp() {
+        return entities.areUp();
+    }
+
+    public void updateStatus() {
+        for (CustomEntity entity : entities.entities()) {
+            EntityStatus entityStatus = mapEntityStatus(entity.status());
+            status.setCurrentEntityStatus(entity.getName(), entityStatus);
+        }
+    }
+
+    private EntityStatus mapEntityStatus(BrooklynEntityStatus status) {
+        switch (status) {
+            case RUNNING:
+                return EntityStatus.STARTED;
+            case ON_FIRE:
+                return EntityStatus.FAILED;
+            case CREATED:
+            default:
+                return EntityStatus.UNAVAILABLE;
+        }
     }
 }

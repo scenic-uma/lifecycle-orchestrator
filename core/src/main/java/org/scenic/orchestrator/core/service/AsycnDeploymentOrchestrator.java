@@ -1,5 +1,6 @@
 package org.scenic.orchestrator.core.service;
 
+import org.scenic.orchestrator.core.ManagementContext;
 import org.scenic.orchestrator.core.deployer.DeployerProxy;
 import org.scenic.orchestrator.core.dto.RunningAppContext;
 import org.scenic.orchestrator.core.service.plan.PlanManager;
@@ -15,10 +16,12 @@ public class AsycnDeploymentOrchestrator implements DeploymentOrchestrator {
 
     private final DeployerProxy deployerProxy;
     private final PlanManager planManager;
+    private final ManagementContext managementContext;
 
-    public AsycnDeploymentOrchestrator(DeployerProxy deployerProxy, PlanManager planManager) {
+    public AsycnDeploymentOrchestrator(DeployerProxy deployerProxy, PlanManager planManager, ManagementContext managementContext) {
         this.deployerProxy = deployerProxy;
         this.planManager = planManager;
+        this.managementContext=managementContext;
     }
 
     @Override
@@ -30,7 +33,8 @@ public class AsycnDeploymentOrchestrator implements DeploymentOrchestrator {
         System.out.println("Add to the deployer application: " + runningAppContext.getApplicationName() + " with id " + appId);
         runningAppContext.setEntities(deployerProxy.getApplicationEntities(appId));
         System.out.println("Start the management");
-        planManager.manage(runningAppContext);
+        planManager.deploy(runningAppContext);
+        managementContext.addRunningAppContext(runningAppContext);
     }
 
 

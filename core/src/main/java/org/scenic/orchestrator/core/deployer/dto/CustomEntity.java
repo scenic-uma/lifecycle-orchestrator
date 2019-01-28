@@ -2,17 +2,25 @@ package org.scenic.orchestrator.core.deployer.dto;
 
 import java.util.Map;
 
+import org.springframework.web.client.RestTemplate;
+
 /**
  * Created by Jose on 24/01/19.
  */
 
 public class CustomEntity {
 
+    private static final String IS_UP_SENSOR = "/service.isUp";
+    private static final String STATUS_SENSOR = "/service.state";
+
     private String id;
     private String name;
     private String type;
     private String catalogItemId;
     private Map<String, String> links;
+
+    private RestTemplate brooklynRestTemplate;
+    private String sensorlink;
 
     public String getId() {
         return id;
@@ -51,9 +59,21 @@ public class CustomEntity {
     }
 
     public void setLinks(Map<String, String> links) {
+        this.sensorlink = links.get("sensors");
         this.links = links;
     }
 
+    public void setBrooklynRestTemplate(RestTemplate brooklynRestTemplate) {
+        this.brooklynRestTemplate = brooklynRestTemplate;
+    }
+
+    public Boolean isUp() {
+        return brooklynRestTemplate.getForEntity(sensorlink + IS_UP_SENSOR, Boolean.class).getBody();
+    }
+
+    public BrooklynEntityStatus status() {
+        return brooklynRestTemplate.getForEntity(sensorlink + STATUS_SENSOR, BrooklynEntityStatus.class).getBody();
+    }
 
     /*"id": "nDQUMK7J",
             "name": "SoftcareWS",

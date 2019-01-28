@@ -35,7 +35,7 @@ public class PlanStepExecutor {
             String entityId = context.getEntityByDisplayName(step.getNode()).getId();
             System.out.println(String.format(EXECUTION_MESSAGE, step.getNode(), entityId, step.getOperation()));
             deployerProxy.stopEffector(context, entityId);
-            context.getStatus().setCurrentEntityStatus(step.getNode(), EntityStatus.STOPPED);
+            context.getStatus().setCurrentEntityStatus(step.getNode(), EntityStatus.UNAVAILABLE);
         }
         } catch (Exception e) {
             context.getStatus().setCurrentEntityStatus(step.getNode(), EntityStatus.FAILED);
