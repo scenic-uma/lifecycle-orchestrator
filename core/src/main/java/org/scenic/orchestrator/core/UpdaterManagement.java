@@ -15,7 +15,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class UpdaterManagement {
 
-
     private final ManagementContext managementContext;
     private PlanManager planManager;
 

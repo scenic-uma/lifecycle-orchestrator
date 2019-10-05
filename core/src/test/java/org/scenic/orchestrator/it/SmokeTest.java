@@ -11,9 +11,12 @@ import org.apache.brooklyn.rest.api.VersionApi;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
+import org.scenic.orchestrator.core.dto.Plan;
 import org.scenic.orchestrator.it.BaseIntegrationTest;
+import org.scenic.orchestrator.manager.ManagerAnalyzerClient;
 import org.scenic.orchestrator.webapp.CustomVersionsController;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 

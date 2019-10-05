@@ -1,6 +1,4 @@
-package org.scenic.orchestrator.core.service;
-
-import java.util.Map;
+package org.scenic.orchestrator.manager;
 
 import org.scenic.orchestrator.core.dto.ApplicationStatus;
 import org.scenic.orchestrator.core.dto.Plan;
@@ -11,21 +9,16 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 /**
  * Created by Jose on 22/01/19.
  */
-@Service
 public class ManagerAnalyzerClient {
 
-    private static final String BASE = "/mm";
-    private static final String APPLICATION_RESOURCE = BASE + "/%s";
-    private static final String GET_PLAN_TEMPLATE = APPLICATION_RESOURCE + "/plan";
+    protected  static final String BASE = "/mm";
+    protected static final String APPLICATION_RESOURCE = BASE + "/%s";
+    private static final String GET_PARALLEL_PLAN_TEMPLATE = APPLICATION_RESOURCE + "/psteps";
 
     private final RestTemplate restTemplate;
-
-
 
     @Autowired
     public ManagerAnalyzerClient(RestTemplate restTemplate) {
@@ -37,7 +30,11 @@ public class ManagerAnalyzerClient {
     }
 
     public Plan getPlan(String applicationName) {
-        return restTemplate.getForEntity(String.format(GET_PLAN_TEMPLATE, applicationName), Plan.class).getBody();
+        return restTemplate.getForEntity(String.format(getPlanResource(), applicationName), Plan.class).getBody();
+    }
+
+    protected String getPlanResource(){
+        return GET_PARALLEL_PLAN_TEMPLATE;
     }
 
     public void putStatus(String applicationName, ApplicationStatus applicationStatus) {
@@ -46,7 +43,7 @@ public class ManagerAnalyzerClient {
         headers.setContentType(MediaType.APPLICATION_JSON);
 
 
-        HttpEntity<ApplicationStatus> entity = new HttpEntity<>(applicationStatus,headers);
+        HttpEntity<ApplicationStatus> entity = new HttpEntity<>(applicationStatus, headers);
 
         restTemplate.put(String.format(APPLICATION_RESOURCE, applicationName), entity);
     }

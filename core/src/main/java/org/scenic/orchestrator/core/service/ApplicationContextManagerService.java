@@ -7,6 +7,7 @@ import org.scenic.orchestrator.core.dto.InitialAppStatusService;
 import org.scenic.orchestrator.core.dto.Plan;
 import org.scenic.orchestrator.core.dto.RunningAppContext;
 import org.scenic.orchestrator.core.modifier.TopologyModifierService;
+import org.scenic.orchestrator.manager.ManagerAnalyzerClient;
 import org.springframework.stereotype.Service;
 import org.yaml.snakeyaml.Yaml;
 
@@ -35,13 +36,24 @@ public class ApplicationContextManagerService {
         this.topologyModifierService = topologyModifierService;
     }
 
+    //Crea RunningApplication Context
     public RunningAppContext postApplicationContext(String applicationTopology) {
+
         final String applicationName = getApplicationName(applicationTopology);
+
+        //manda la app a analyzer
         managerAnalyzerClient.deployApplication(applicationTopology);
+
+        //actualiza el estado (source) unavailable to (target) started
         managerAnalyzerClient.putStatus(applicationName, initialAppStatusService.build(applicationTopology));
+
+        //coge el plan
         final Plan plan = managerAnalyzerClient.getPlan(getApplicationName(applicationTopology));
+
+        //Application status es el estado actual de la app
         final ApplicationStatus status = initialAppStatusService.build(plan.getEntities());
 
+        //Genera un RunningAppContext y lo (guardando la topologia con los midificadores necesarios)
         return new RunningAppContext(applicationName, status, plan, topologyModifierService.apply(applicationTopology));
     }
 

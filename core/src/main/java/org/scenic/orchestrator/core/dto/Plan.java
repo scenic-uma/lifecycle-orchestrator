@@ -4,10 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public class Plan {
 
+    @JsonAlias({"parallelSteps", "plan"})
     private List<PlanStep> plan;
 
     public Plan() {
