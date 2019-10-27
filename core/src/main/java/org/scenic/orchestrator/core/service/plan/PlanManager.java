@@ -64,7 +64,7 @@ public class PlanManager {
     */
 
     private void synchronizeAppContext(RunningAppContext appContext) {
-        System.out.println("Synchronizing App Context");
+        System.out.println("-------Synchronizing App Context");
         appContext.updateStatus();
 
         //Actualiza el estado en el manager y carga el plan de nuevo

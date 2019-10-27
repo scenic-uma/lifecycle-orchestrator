@@ -26,16 +26,23 @@ public class ParallelStepExecutorStrategy extends PlanStepExecutorStrategy {
     @Override
     public void executePlan(RunningAppContext appContext) {
 
+
+
         List<StepExecutionTask> stepExecutions = appContext.getPlan().getPlan().stream()
-                .map(p -> new StepExecutionTask(planStepExecutor, p, appContext))
+                .map(p -> {
+                    System.out.println(String.format("Creating task for Node=%s, Operation=%s, Intf=%s", p.getNode(), p.getOperation(), p.getIntf()));
+                    return new StepExecutionTask(planStepExecutor, p, appContext);
+                })
                 .collect(toList());
 
         try {
+            System.out.println("Executing tasks");
             executorService.invokeAll(stepExecutions);
 
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+        System.out.println("[END] Executed tasks");
     }
 
 

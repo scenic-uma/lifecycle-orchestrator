@@ -76,10 +76,13 @@ public class RunningAppContext {
     }
 
     public void updateStatus() {
+        System.out.println("-- Update the status from brooklyn -- ");
         for (CustomEntity entity : entities.entities()) {
             EntityStatus entityStatus = mapEntityStatus(entity.status());
             status.setCurrentEntityStatus(entity.getName(), entityStatus);
+            System.out.println(String.format("%s: %s", entity.getName(), entityStatus));
         }
+        System.out.println("[End] -- ");
     }
 
     private EntityStatus mapEntityStatus(BrooklynEntityStatus status) {

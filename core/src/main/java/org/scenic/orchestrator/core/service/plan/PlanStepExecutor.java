@@ -24,6 +24,7 @@ public class PlanStepExecutor {
     public void executeStep(PlanStep step, RunningAppContext context) {
 
         try{
+            System.out.println("PlanStepExecutor.class -- Execute taks: " + step.getOperation());
 
         if(step.getOperation() == PlanOperation.START) {
             String entityId = context.getEntityByDisplayName(step.getNode()).getId();

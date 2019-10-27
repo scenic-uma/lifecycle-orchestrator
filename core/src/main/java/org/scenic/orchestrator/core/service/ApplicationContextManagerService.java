@@ -2,6 +2,7 @@ package org.scenic.orchestrator.core.service;
 
 import java.util.Map;
 
+import org.scenic.orchestrator.core.deployer.DeployerProxy;
 import org.scenic.orchestrator.core.dto.ApplicationStatus;
 import org.scenic.orchestrator.core.dto.InitialAppStatusService;
 import org.scenic.orchestrator.core.dto.Plan;
@@ -27,13 +28,16 @@ public class ApplicationContextManagerService {
 
     private final TopologyModifierService topologyModifierService;
 
+    private final DeployerProxy deployerProxy;
+
     public ApplicationContextManagerService(ManagerAnalyzerClient managerAnalyzerClient, Yaml yaml,
                                             InitialAppStatusService initialAppStatusService,
-                                            TopologyModifierService topologyModifierService) {
+                                            TopologyModifierService topologyModifierService, DeployerProxy deployerProxy) {
         this.managerAnalyzerClient = managerAnalyzerClient;
         this.yaml = yaml;
         this.initialAppStatusService = initialAppStatusService;
         this.topologyModifierService = topologyModifierService;
+        this.deployerProxy=deployerProxy;
     }
 
     //Crea RunningApplication Context
@@ -60,5 +64,23 @@ public class ApplicationContextManagerService {
     private String getApplicationName(String applicationTopology) {
         final Map<String, Object> obj = yaml.load(applicationTopology);
         return obj.get("template_name").toString();
+    }
+
+    public RunningAppContext sycnApplication(String applicationTopology, String appId) {
+        //RunningAppContext runningAppContext = postApplicationContext(applicationTopology);
+        final String applicationName = getApplicationName(applicationTopology);
+        managerAnalyzerClient.deployApplication(applicationTopology);
+        ApplicationStatus status = initialAppStatusService.buildSycn(applicationTopology);
+        managerAnalyzerClient.putStatus(applicationName, status);
+
+        //Tiene que ser vacio el plan
+        final Plan plan = managerAnalyzerClient.getPlan(getApplicationName(applicationTopology));
+        RunningAppContext runningAppContext = new RunningAppContext(applicationName, status, plan, topologyModifierService.apply(applicationTopology));
+        runningAppContext.setAppId(appId);
+
+        System.out.println("Sync the deployed application: " + runningAppContext.getApplicationName() + " with id " + appId);
+        runningAppContext.setEntities(deployerProxy.getApplicationEntities(appId));
+
+        return runningAppContext;
     }
 }

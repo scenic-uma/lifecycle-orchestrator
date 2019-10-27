@@ -23,8 +23,7 @@ public class UpdaterManagement {
         this.planManager = planManager;
     }
 
-
-    @Scheduled(fixedRateString = "${instructionSchedularTime}")
+    //@Scheduled(fixedRateString = "${instructionSchedularTime}")
     public void updateApplication() {
 
         List<RunningAppContext> applicationsToUpdate = MutableList.of();
@@ -40,6 +39,7 @@ public class UpdaterManagement {
 
     @Async("threadPoolTaskExecutor")
     public void manageApplication(RunningAppContext appContext){
+        System.out.println("Checking updating");
         planManager.update(appContext);
         managementContext.addRunningAppContext(appContext);
     }
