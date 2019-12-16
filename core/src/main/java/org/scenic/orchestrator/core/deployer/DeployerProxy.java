@@ -27,8 +27,13 @@ public class DeployerProxy {
 
     private static final String START_EFFECTOR_NAME = "start";
     private static final String STOP_EFFECTOR_NAME = "stop";
+    private static final String RESTART_EFFECTOR_NAME = "restart";
+
     private static final String STOP_MACHINE_MODE = "stopMachineMode";
     private static final String STOP_MACHINE_IF_NOT_STOPPED = "IF_NOT_STOPPED";
+
+    private static final String STOP_PROCESS_MODE = "stopProcessMode";
+    private static final String STOP_PROCESS_MODE_NEVER = "NEVER";
 
     private final BrooklynApi brooklynApi;
     private final ApplicationApi applicationApi;
@@ -74,6 +79,19 @@ public class DeployerProxy {
         executeEffector(effectorTemplate);
     }
 
+    public void restartEffector(RunningAppContext app, String entityId) {
+        EffectorTemplate effectorTemplate =
+                new EffectorTemplate(app, entityId, RESTART_EFFECTOR_NAME, getRestartBody());
+        executeEffector(effectorTemplate);
+    }
+
+
+    public void releaseEffector(RunningAppContext app, String entityId) {
+        EffectorTemplate effectorTemplate =
+                new EffectorTemplate(app, entityId, STOP_EFFECTOR_NAME, getReleaseBody());
+        executeEffector(effectorTemplate);
+    }
+
     private void executeEffector(EffectorTemplate effectorTemplate) {
         try {
             restBrooklynClient.executeEffector(effectorTemplate);
@@ -87,6 +105,29 @@ public class DeployerProxy {
     }
 
     public String getStopBody() {
+        try {
+            return objectMapper.writeValueAsString(MutableMap.of(
+                    STOP_MACHINE_MODE, STOP_PROCESS_MODE_NEVER,
+                    STOP_PROCESS_MODE, STOP_MACHINE_IF_NOT_STOPPED
+            ));
+        } catch (Exception e) {
+            throw new RuntimeException("STOP params can not be generated", e);
+        }
+    }
+    public String getRestartBody() {
+        try {
+            return objectMapper.writeValueAsString(MutableMap.of(
+
+            ));
+        } catch (Exception e) {
+            throw new RuntimeException("STOP params can not be generated", e);
+        }
+    }
+
+
+
+
+    public String getReleaseBody() {
         try {
             return objectMapper.writeValueAsString(MutableMap.of(STOP_MACHINE_MODE, STOP_MACHINE_IF_NOT_STOPPED));
         } catch (Exception e) {

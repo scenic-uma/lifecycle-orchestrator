@@ -1,7 +1,12 @@
 package org.scenic.orchestrator.core.deployer.dto;
 
+import static java.util.Arrays.stream;
+
+import java.util.List;
 import java.util.Map;
 
+import org.apache.brooklyn.rest.domain.LocationSummary;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.web.client.RestTemplate;
 
 /**
@@ -75,6 +80,51 @@ public class CustomEntity {
         return brooklynRestTemplate.getForEntity(sensorlink + STATUS_SENSOR, BrooklynEntityStatus.class).getBody();
     }
 
+    public String getSensor(String sensorName){
+        return brooklynRestTemplate.getForEntity(sensorlink +"/" +sensorName, String.class).getBody();
+    }
+
+    public boolean hasSshLiveCloudResources(){
+        return stream(brooklynRestTemplate.getForEntity(getLinks().get("locations"), LocationSummary[].class).getBody())
+                .anyMatch(this::hasSshResources);
+    }
+
+    private boolean hasSshResources(LocationSummary l){
+        return l.getType().toLowerCase().contains("ssh");
+    }
+
+    public boolean isInPaas(){
+        return stream(brooklynRestTemplate.getForEntity(getLinks().get("locations"), LocationSummary[].class).getBody())
+                .anyMatch(l -> l.getType().toLowerCase().contains("cloudfoundrypaaslocation"));
+    }
+
+    public static class LocationSummary{
+
+        String id;
+        String type;
+
+        public LocationSummary(){
+            this.id=null;
+            this.type=null;
+        }
+
+        public String getId(){
+            return id;
+        }
+
+        public String getType(){
+            return type;
+        }
+
+        public String setId(String id){
+            return this.id=id;
+        }
+
+        public String getType(String type){
+            return this.type=type;
+        }
+    }
+
     /*"id": "nDQUMK7J",
             "name": "SoftcareWS",
             "type": "org.apache.brooklyn.entity.webapp.tomcat.TomcatServer",
@@ -97,6 +147,4 @@ public class CustomEntity {
                 "catalog": "/v1/catalog/entities/org.apache.brooklyn.entity.webapp.tomcat.TomcatServer/0.9.0"
     }
     */
-
-
 }
