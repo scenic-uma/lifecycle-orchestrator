@@ -99,7 +99,18 @@ public class RunningAppContext {
 
 
     private EntityStatus mapEntityStatus(CustomEntity entity) {
-        BrooklynEntityStatus status = entity.status();
+
+        BrooklynEntityStatus status = entity.getStatus();
+
+        while (status == BrooklynEntityStatus.STOPPING) {
+            System.out.println("## UNSUPPORTED STOPPING status for entity " + entity.getName());
+            try {
+                Thread.sleep(5000l);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+            status = entity.getStatus();
+        }
         boolean hasLiveCloudResources = hasCloudResources(entity);
         switch (status) {
             case RUNNING:
@@ -129,7 +140,7 @@ public class RunningAppContext {
     }
 
     private boolean applicationExistsInPivotal(CustomEntity entity) {
-        String webName = webAppDeployedWar(entity);
+        String webName = webAppDeployedWar(entity).replace("\"", "");
         System.out.println("checking paas resources with name==> " + webName);
         Boolean result = null;
         int loop = 0;

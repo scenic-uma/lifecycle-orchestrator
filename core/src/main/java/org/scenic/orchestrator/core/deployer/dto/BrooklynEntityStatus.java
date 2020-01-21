@@ -8,7 +8,8 @@ public enum BrooklynEntityStatus {
     RUNNING,
     ON_FIRE,
     CREATED,
-    STOPPED
+    STOPPED,
+    STOPPING
 
 
 }

@@ -32,7 +32,7 @@ public class UpdateStatusController {
                 try{
                     updaterManagement.updateApplication();
                 } catch(Exception e){
-                    System.out.println("Error in update " + e.getMessage());
+                    System.out.println("Error in update " + e.getMessage() + e.getCause());
                     throw new RuntimeException(e);
                 }
             }

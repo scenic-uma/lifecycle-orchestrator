@@ -33,6 +33,21 @@ public class PivotalClient {
         }
     }
 
+    public void refresh() {
+        int i = 0;
+        while (i < 10)
+            try {
+                CLIENT.login().getRefreshToken();
+                return;
+            } catch (Exception e) {
+                System.out.println("Error in refresh: retrying");
+                i++;
+                if (i == 10) {
+                    throw e;
+                }
+            }
+    }
+
     private static URL getTargetURL(String target) {
         try {
             return URI.create(target).toURL();
@@ -47,20 +62,38 @@ public class PivotalClient {
 
     private CloudApplication getApplication(String name) {
         return CLIENT.getApplication(name);
+
     }
 
-    public boolean applicationExist(String appName){
-        try{
-            return getApplication(appName) != null;
-        } catch (CloudFoundryException e ){
-            if (e.getStatusCode().equals(HttpStatus.NOT_FOUND))
-            {
+    public boolean applicationExist(String appName) {
+        System.out.println("Checking if application exist");
+        //int i=0;
+        //int limit=20;
+        //while(i<limit){
+
+        try {
+            //return getApplication(appName) != null;
+            return CLIENT.getApplications()
+                    .stream()
+                    .anyMatch(a -> appName.equals(a.getName()));
+        } catch (CloudFoundryException e) {
+            if (e.getStatusCode().equals(HttpStatus.NOT_FOUND)) {
+                System.out.println("NotFoundApplication" + e.getCause());
                 return false;
             }
+            System.out.println("Retring checking because" + e.getCause());
+            //  if(i>limit){
             throw e;
-        } catch (Exception ee){
+            //  }
+        } catch (Exception ee) {
+            System.out.println("Retring checking because" + ee.getCause());
+            //if(i>limit){
             throw ee;
+            //}
 
         }
+        //    i++;
+        //}
+        //return false;
     }
 }

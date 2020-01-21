@@ -12,7 +12,8 @@ public enum EntityStatus {
     STARTED("started"),
     STOPPED("stopped"),
     FAILED("failed"),
-    RELEASED("failed");
+    RELEASED("failed"),
+    ;
 
     private final String alias;
 

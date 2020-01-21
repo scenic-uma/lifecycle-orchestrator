@@ -76,7 +76,7 @@ public class CustomEntity {
         return brooklynRestTemplate.getForEntity(sensorlink + IS_UP_SENSOR, Boolean.class).getBody();
     }
 
-    public BrooklynEntityStatus status() {
+    public BrooklynEntityStatus getStatus() {
         return brooklynRestTemplate.getForEntity(sensorlink + STATUS_SENSOR, BrooklynEntityStatus.class).getBody();
     }
 
