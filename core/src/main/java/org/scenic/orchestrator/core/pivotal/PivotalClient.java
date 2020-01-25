@@ -33,6 +33,10 @@ public class PivotalClient {
         }
     }
 
+    public CloudFoundryClient client(){
+        return CLIENT;
+    }
+
     public void refresh() {
         int i = 0;
         while (i < 10)
