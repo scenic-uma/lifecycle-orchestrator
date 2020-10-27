@@ -6,10 +6,10 @@ package org.scenic.orchestrator.core.deployer.dto;
 public enum BrooklynEntityStatus {
 
     RUNNING,
+    STARTING,
     ON_FIRE,
     CREATED,
     STOPPED,
     STOPPING
-
 
 }

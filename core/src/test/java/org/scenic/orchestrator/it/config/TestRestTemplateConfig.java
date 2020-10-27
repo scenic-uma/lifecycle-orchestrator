@@ -12,8 +12,8 @@ import org.springframework.web.client.RestTemplate;
 @Configuration
 public class TestRestTemplateConfig {
 
-    @Value("${wiremock.server.port}")
-    private int port;
+    //@Value("${wiremock.server.port}")
+    private int port=8080;
 
     @Bean
     public RestTemplate restTemplate() {

@@ -114,6 +114,7 @@ public class RunningAppContext {
         boolean hasLiveCloudResources = hasCloudResources(entity);
         switch (status) {
             case RUNNING:
+            case STARTING:
                 return EntityStatus.STARTED;
             case STOPPED:
                 return hasLiveCloudResources ? EntityStatus.STOPPED : EntityStatus.UNAVAILABLE;

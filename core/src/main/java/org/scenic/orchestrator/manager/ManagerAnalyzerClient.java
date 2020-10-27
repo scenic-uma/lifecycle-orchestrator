@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 /**
@@ -14,7 +13,7 @@ import org.springframework.web.client.RestTemplate;
  */
 public class ManagerAnalyzerClient {
 
-    protected  static final String BASE = "/mm";
+    protected static final String BASE = "/mm";
     protected static final String APPLICATION_RESOURCE = BASE + "/%s";
     private static final String GET_PARALLEL_PLAN_TEMPLATE = APPLICATION_RESOURCE + "/psteps";
 
@@ -33,7 +32,7 @@ public class ManagerAnalyzerClient {
         return restTemplate.getForEntity(String.format(getPlanResource(), applicationName), Plan.class).getBody();
     }
 
-    protected String getPlanResource(){
+    protected String getPlanResource() {
         return GET_PARALLEL_PLAN_TEMPLATE;
     }
 
@@ -45,7 +44,23 @@ public class ManagerAnalyzerClient {
 
         HttpEntity<ApplicationStatus> entity = new HttpEntity<>(applicationStatus, headers);
 
-        restTemplate.put(String.format(APPLICATION_RESOURCE, applicationName), entity);
+        putStatusWithRetries(applicationName, entity);
+    }
+
+    private void putStatusWithRetries(String applicationName, HttpEntity<ApplicationStatus> entity) {
+        int i = 0;
+        boolean pushed = false;
+        while ((i <= 20) && (!pushed)) {
+            try {
+                i++;
+                restTemplate.put(String.format(APPLICATION_RESOURCE, applicationName), entity);
+                pushed = true;
+            } catch (Exception e) {
+                if (i == 20) {
+                    throw e;
+                }
+            }
+        }//while
     }
 
 
