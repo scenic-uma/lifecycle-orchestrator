@@ -3,7 +3,7 @@ package org.scenic.orchestrator.core.service.plan;
 import org.scenic.orchestrator.core.dto.ApplicationStatus;
 import org.scenic.orchestrator.core.dto.Plan;
 import org.scenic.orchestrator.core.dto.RunningAppContext;
-import org.scenic.orchestrator.core.service.ManagerAnalyzerClient;
+import org.scenic.orchestrator.manager.ManagerAnalyzerClient;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -32,8 +32,6 @@ public class RunningAppContextSynchronizer {
         System.out.println("--------**");
     }
 
-
-    //TODO: avoid this... **** ... with lombok
     public String planToString(Plan plan){
         try{
             return new ObjectMapper().writeValueAsString(plan);
@@ -42,7 +40,6 @@ public class RunningAppContextSynchronizer {
         }
     }
 
-    //TODO: avoid this... **** ... with lombok
     public String statusToString(ApplicationStatus status){
         try{
             return new ObjectMapper().writeValueAsString(status);

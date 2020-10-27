@@ -15,7 +15,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 @RunWith(SpringRunner.class)
 @TestPropertySource("classpath:application-it.properties")
 @SpringBootTest(classes = ITConfig.class)
-@AutoConfigureWireMock(port = 0)
+//@AutoConfigureWireMock(port = 8080)
 public abstract class BaseIntegrationTest {
 
     @MockBean

@@ -27,12 +27,18 @@ public class AsycnDeploymentOrchestrator implements DeploymentOrchestrator {
     @Override
     @Async("threadPoolTaskExecutor")
     public void deploy(RunningAppContext runningAppContext) throws InterruptedException {
+
+        //Esto se hace bajo demanda cuando se hace deploy
         System.out.println("Start to deploy application: " + runningAppContext.getApplicationName());
         String appId = deployerProxy.deployApp(runningAppContext.getApplicationName(), runningAppContext.getApplicationTopology());
+        //Crea la app sin iniciar en brooklyn
+
         runningAppContext.setAppId(appId);
         System.out.println("Add to the deployer application: " + runningAppContext.getApplicationName() + " with id " + appId);
+        //Pones las entidades en el runnign context
         runningAppContext.setEntities(deployerProxy.getApplicationEntities(appId));
         System.out.println("Start the management");
+        //
         planManager.deploy(runningAppContext);
         managementContext.addRunningAppContext(runningAppContext);
     }

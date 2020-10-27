@@ -10,7 +10,8 @@ public enum PlanOperation {
 
     START("start"),
     STOP("stop"),
-    RELEASE("release");
+    RELEASE("release"),
+    RESTART("restart");
 
     private String alias;
 

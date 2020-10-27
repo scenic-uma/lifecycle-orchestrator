@@ -2,11 +2,14 @@ package org.scenic.orchestrator.core.service;
 
 import java.util.Map;
 
+import org.scenic.orchestrator.core.deployer.DeployerProxy;
 import org.scenic.orchestrator.core.dto.ApplicationStatus;
 import org.scenic.orchestrator.core.dto.InitialAppStatusService;
 import org.scenic.orchestrator.core.dto.Plan;
 import org.scenic.orchestrator.core.dto.RunningAppContext;
 import org.scenic.orchestrator.core.modifier.TopologyModifierService;
+import org.scenic.orchestrator.core.pivotal.PivotalClient;
+import org.scenic.orchestrator.manager.ManagerAnalyzerClient;
 import org.springframework.stereotype.Service;
 import org.yaml.snakeyaml.Yaml;
 
@@ -26,27 +29,63 @@ public class ApplicationContextManagerService {
 
     private final TopologyModifierService topologyModifierService;
 
+    private final DeployerProxy deployerProxy;
+
+    private final PivotalClient pivotalClient;
+
     public ApplicationContextManagerService(ManagerAnalyzerClient managerAnalyzerClient, Yaml yaml,
                                             InitialAppStatusService initialAppStatusService,
-                                            TopologyModifierService topologyModifierService) {
+                                            TopologyModifierService topologyModifierService, DeployerProxy deployerProxy,
+                                            PivotalClient pivotalClient) {
         this.managerAnalyzerClient = managerAnalyzerClient;
         this.yaml = yaml;
         this.initialAppStatusService = initialAppStatusService;
         this.topologyModifierService = topologyModifierService;
+        this.deployerProxy = deployerProxy;
+        this.pivotalClient = pivotalClient;
     }
 
+    //Crea RunningApplication Context
     public RunningAppContext postApplicationContext(String applicationTopology) {
+
         final String applicationName = getApplicationName(applicationTopology);
+
+        //manda la app a analyzer
         managerAnalyzerClient.deployApplication(applicationTopology);
+
+        //actualiza el estado (source) unavailable to (target) started
         managerAnalyzerClient.putStatus(applicationName, initialAppStatusService.build(applicationTopology));
+
+        //coge el plan
         final Plan plan = managerAnalyzerClient.getPlan(getApplicationName(applicationTopology));
+
+        //Application status es el estado actual de la app
         final ApplicationStatus status = initialAppStatusService.build(plan.getEntities());
 
-        return new RunningAppContext(applicationName, status, plan, topologyModifierService.apply(applicationTopology));
+        //Genera un RunningAppContext y lo (guardando la topologia con los midificadores necesarios)
+        return new RunningAppContext(applicationName, status, plan, topologyModifierService.apply(applicationTopology), pivotalClient);
     }
 
     private String getApplicationName(String applicationTopology) {
         final Map<String, Object> obj = yaml.load(applicationTopology);
         return obj.get("template_name").toString();
+    }
+
+    public RunningAppContext sycnApplication(String applicationTopology, String appId) {
+        //RunningAppContext runningAppContext = postApplicationContext(applicationTopology);
+        final String applicationName = getApplicationName(applicationTopology);
+        managerAnalyzerClient.deployApplication(applicationTopology);
+        ApplicationStatus status = initialAppStatusService.buildSycn(applicationTopology);
+        managerAnalyzerClient.putStatus(applicationName, status);
+
+        //Tiene que ser vacio el plan
+        final Plan plan = managerAnalyzerClient.getPlan(getApplicationName(applicationTopology));
+        RunningAppContext runningAppContext = new RunningAppContext(applicationName, status, plan, topologyModifierService.apply(applicationTopology), pivotalClient);
+        runningAppContext.setAppId(appId);
+
+        System.out.println("Sync the deployed application: " + runningAppContext.getApplicationName() + " with id " + appId);
+        runningAppContext.setEntities(deployerProxy.getApplicationEntities(appId));
+
+        return runningAppContext;
     }
 }

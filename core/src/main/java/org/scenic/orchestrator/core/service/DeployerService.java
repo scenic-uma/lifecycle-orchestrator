@@ -18,11 +18,19 @@ public class DeployerService {
         this.deploymentOrchestrator=deploymentOrchestrator;
     }
 
+
+    //Crea la app sin iniciar en brooklyn
+//    runningAppContext.setAppId(appId);
+//    System.out.println("Add to the deployer application: " + runningAppContext.getApplicationName() + " with id " + appId);
+ //   runningAppContext.setEntities(deployerProxy.getApplicationEntities(appId));
+
     public void deploy(String applicationTopology)
             throws InterruptedException {
         RunningAppContext runningAppContext = applicationContextManagerService.postApplicationContext(applicationTopology);
         deploymentOrchestrator.deploy(runningAppContext);
     }
+
+
 
 
 }

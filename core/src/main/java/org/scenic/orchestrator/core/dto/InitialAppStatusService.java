@@ -27,11 +27,26 @@ public class InitialAppStatusService {
         return build(getNodeTemplateNames(appTopology));
     }
 
+    public ApplicationStatus buildSycn(String appTopology) {
+        return buildSycn(getNodeTemplateNames(appTopology));
+    }
+
     public ApplicationStatus build(List<String> entityNames) {
         Map<String, EntityStatus> current = new HashMap<>();
         Map<String, EntityStatus> target = new HashMap<>();
         for (String entityName : entityNames) {
             current.put(entityName, EntityStatus.UNAVAILABLE);
+            target.put(entityName, EntityStatus.STARTED);
+        }
+
+        return new ApplicationStatus(current, target);
+    }
+
+    public ApplicationStatus buildSycn(List<String> entityNames) {
+        Map<String, EntityStatus> current = new HashMap<>();
+        Map<String, EntityStatus> target = new HashMap<>();
+        for (String entityName : entityNames) {
+            current.put(entityName, EntityStatus.STARTED);
             target.put(entityName, EntityStatus.STARTED);
         }
 
